@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Dummy Friend ERP",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.tillietoons.afghanerp",
   "build": {
     "frontendDist": "../.output/public",
     "devUrl": "http://127.0.0.1:8080",
