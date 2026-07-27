@@ -7,7 +7,7 @@
     "frontendDist": "../.output/public",
     "devUrl": "http://127.0.0.1:8080",
     "beforeDevCommand": "npm run dev -- --host 127.0.0.1",
-    "beforeBuildCommand": "npm run build"
+    "beforeBuildCommand": "npm run build:desktop"
   },
   "app": {
     "windows": [
