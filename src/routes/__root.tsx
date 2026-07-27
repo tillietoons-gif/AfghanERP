@@ -131,6 +131,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+    return <>{children}</>;
+  }
+
   return (
     <html lang="ps-AF" dir="rtl">
       <head>
@@ -148,9 +152,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
-    installFormPreservation();
+    const isDesktopApp = "__TAURI_INTERNALS__" in window;
+    if (!isDesktopApp) {
+      installFormPreservation();
+      registerOfflineApp();
+    }
     installErrorCapture();
-    registerOfflineApp();
     const onError = (e: ErrorEvent) =>
       handleError(e.error ?? e.message, { context: "غیرمنتظره تېروتنه", silent: true });
     const onRejection = (e: PromiseRejectionEvent) =>
