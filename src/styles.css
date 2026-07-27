@@ -64,6 +64,7 @@
 
 :root {
   --radius: 0.85rem;
+  --app-zoom: 1;
 
   /* Emerald Prestige — refined depth system */
   --background: oklch(0.985 0.006 130);
@@ -184,6 +185,10 @@
   --dur-fast: 140ms;
   --dur-base: 220ms;
   --dur-slow: 380ms;
+}
+
+.app-workspace {
+  zoom: var(--app-zoom);
 }
 
 .dark {

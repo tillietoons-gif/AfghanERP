@@ -323,7 +323,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </aside>
 
-          <div className="flex min-w-0 flex-1 flex-col">
+          <div className="app-workspace flex min-w-0 flex-1 flex-col">
             {/* Top command bar */}
             <header className="sticky top-0 z-30 border-b border-border-hair bg-background/75 backdrop-blur supports-[backdrop-filter]:bg-background/55">
               <div className="flex h-14 items-center gap-3 px-3 sm:px-5">

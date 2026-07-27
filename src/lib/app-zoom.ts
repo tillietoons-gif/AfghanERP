@@ -20,7 +20,10 @@ export function getAppZoom(): number {
 
 export function setAppZoom(value: number): number {
   const zoom = normalizeZoom(value);
-  if (typeof document !== "undefined") document.documentElement.style.zoom = `${zoom}%`;
+  if (typeof document !== "undefined") {
+    document.documentElement.style.removeProperty("zoom");
+    document.documentElement.style.setProperty("--app-zoom", String(zoom / 100));
+  }
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(ZOOM_KEY, String(zoom));
