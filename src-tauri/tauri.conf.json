@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.tillietoons.afghanerp",
   "build": {
-    "frontendDist": "../.output/public",
+    "frontendDist": "../.output/desktop",
     "devUrl": "http://127.0.0.1:8080",
     "beforeDevCommand": "npm run dev -- --host 127.0.0.1",
     "beforeBuildCommand": "npm run build:desktop"
