@@ -31,7 +31,8 @@ import { getScannerPrefs, setScannerPrefs, type ScannerPrefs } from "@/lib/scann
 import { getQuickSalePrefs, setQuickSalePrefs, type QuickSalePrefs } from "@/lib/quick-sale-prefs";
 import { hasAnyRole } from "@/hooks/use-auth";
 import { jalaliDateTime } from "@/lib/format";
-import { Download, HardDrive, RefreshCw, Upload } from "lucide-react";
+import { Download, HardDrive, Minus, Monitor, Plus, RefreshCw, RotateCcw, Upload } from "lucide-react";
+import { APP_ZOOM, getAppZoom, setAppZoom } from "@/lib/app-zoom";
 import { resetLocalOperatorPassword, signOutLocally } from "@/lib/local-auth";
 import {
   exportLocalDatabase,
@@ -54,6 +55,7 @@ const TAB_KEYS = [
   "scanner",
   "quicksale",
   "printer",
+  "display",
   "security",
   "backup",
   "audit",
@@ -206,6 +208,9 @@ function SettingsPage() {
             </TabsTrigger>
             <TabsTrigger value="printer" className="shrink-0 data-[state=active]:shadow-sm">
               {t.printerSelfTest}
+            </TabsTrigger>
+            <TabsTrigger value="display" className="shrink-0 data-[state=active]:shadow-sm">
+              ښودنه
             </TabsTrigger>
             {isAdmin && (
               <TabsTrigger value="security" className="shrink-0 data-[state=active]:shadow-sm">
@@ -494,6 +499,10 @@ function SettingsPage() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="display" className="mt-4">
+          <DisplayZoomCard />
+        </TabsContent>
+
         {isAdmin && (
           <TabsContent value="security" className="mt-4">
             <PasswordResetCard />
@@ -513,6 +522,69 @@ function SettingsPage() {
         )}
       </Tabs>
     </div>
+  );
+}
+
+function DisplayZoomCard() {
+  const [zoom, setZoom] = useState(() => getAppZoom());
+
+  useEffect(() => {
+    const onZoomChange = (event: Event) => setZoom((event as CustomEvent<number>).detail);
+    window.addEventListener(APP_ZOOM.ZOOM_EVENT, onZoomChange);
+    return () => window.removeEventListener(APP_ZOOM.ZOOM_EVENT, onZoomChange);
+  }, []);
+
+  const updateZoom = (value: number) => setZoom(setAppZoom(value));
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Monitor className="h-4 w-4" />د اپلیکیشن ښودنه
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4 text-sm">
+        <p className="text-muted-foreground">
+          د اپلیکیشن د متن او برخو اندازه بدله کړئ. دا غوره توب په دې وسیله کې خوندي کیږي.
+        </p>
+        <div className="flex items-center gap-2" dir="ltr">
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => updateZoom(zoom - APP_ZOOM.ZOOM_STEP)}
+            disabled={zoom <= APP_ZOOM.MIN_ZOOM}
+            title="Zoom out"
+          >
+            <Minus className="h-4 w-4" />
+            <span className="sr-only">Zoom out</span>
+          </Button>
+          <div className="min-w-20 text-center text-lg font-semibold tabular-nums">{zoom}%</div>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => updateZoom(zoom + APP_ZOOM.ZOOM_STEP)}
+            disabled={zoom >= APP_ZOOM.MAX_ZOOM}
+            title="Zoom in"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="sr-only">Zoom in</span>
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => updateZoom(APP_ZOOM.DEFAULT_ZOOM)}
+            disabled={zoom === APP_ZOOM.DEFAULT_ZOOM}
+            title="Reset zoom"
+          >
+            <RotateCcw className="h-4 w-4" />
+            <span className="sr-only">Reset zoom</span>
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground" dir="ltr">
+          Ctrl + / Ctrl - to zoom, Ctrl 0 to reset
+        </p>
+      </CardContent>
+    </Card>
   );
 }
 
