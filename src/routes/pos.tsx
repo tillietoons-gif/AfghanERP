@@ -1607,20 +1607,7 @@ function PosPage() {
 
         <div className="grid flex-1 auto-rows-max grid-cols-2 gap-2 overflow-auto sm:grid-cols-3 lg:grid-cols-4">
           {products?.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => addToCart(p)}
-              disabled={Number(p.stock) <= 0}
-              className="panel hover-lift group flex flex-col items-start gap-1 p-3 text-right transition hover:border-accent/40 hover:shadow-float disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <div className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold">{p.name}</div>
-              <div className="chip !h-5 !text-[10px]">
-                {t.stock}: {num(p.stock, 0)}
-              </div>
-              <div className="mt-auto font-display text-sm font-bold text-primary">
-                {money(p.sale_price)}
-              </div>
-            </button>
+            <ProductPickerCard key={p.id} product={p} cart={cart} onPick={addToCart} />
           ))}
           {products?.length === 0 && (
             <div className="col-span-full grid place-items-center gap-2 rounded-xl border border-dashed border-border-hair bg-surface-1/60 py-10 text-center text-sm text-muted-foreground">
@@ -1688,6 +1675,31 @@ function PosPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function ProductPickerCard({
+  product,
+  cart,
+  onPick,
+}: {
+  product: { id: string; name: string; sale_price: number; stock: number };
+  cart: CartLine[];
+  onPick: (product: { id: string; name: string; sale_price: number; stock: number }) => void;
+}) {
+  const selectedQuantity = cart.find((line) => line.product_id === product.id)?.quantity ?? 0;
+  const remainingStock = Math.max(0, Number(product.stock) - selectedQuantity);
+
+  return (
+    <button
+      onClick={() => onPick(product)}
+      disabled={remainingStock <= 0}
+      className="panel hover-lift group flex flex-col items-start gap-1 p-3 text-right transition hover:border-accent/40 hover:shadow-float disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      <div className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold">{product.name}</div>
+      <div className="chip !h-5 !text-[10px]">پاتې ذخیره: {num(remainingStock, 0)}</div>
+      <div className="mt-auto font-display text-sm font-bold text-primary">{money(product.sale_price)}</div>
+    </button>
   );
 }
 

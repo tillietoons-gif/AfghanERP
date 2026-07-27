@@ -40,7 +40,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState, type ReactNode } from "react";
 import { ErrorAlertBadge } from "@/components/error-alert-badge";
 import { CommandPalette, openCommandPalette } from "@/components/command-palette";
-import { StatusBar } from "@/components/status-bar";
+import { StatusButton } from "@/components/status-bar";
 import { toPashtoDigits } from "@/lib/format";
 import { formatJalali } from "@/lib/jalali-format";
 import { registerShortcut, isTypingTarget } from "@/lib/shortcuts-registry";
@@ -429,6 +429,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     </TooltipContent>
                   </Tooltip>
                   <ErrorAlertBadge />
+                  <StatusButton />
                   <div className="flex h-9 items-center gap-2 rounded-full border border-border-hair bg-card px-3 shadow-crisp">
                     <Avatar className="h-6 w-6">
                       <AvatarFallback className="bg-primary text-primary-foreground text-[10px] font-semibold">
@@ -468,8 +469,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             </main>
           </div>
         </div>
-
-        <StatusBar />
         <CommandPalette />
       </div>
     </TooltipProvider>

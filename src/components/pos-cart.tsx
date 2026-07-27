@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { money } from "@/lib/format";
+import { money, num } from "@/lib/format";
 import { t } from "@/lib/i18n";
 
 export interface CartLine {
@@ -39,6 +39,9 @@ export function PosCart({ cart, onUpdate, onRemove }: Props) {
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-medium">{l.name}</div>
               <div className="text-xs text-muted-foreground">{money(l.price)}</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">
+                پاتې ذخیره: <span className="font-medium text-foreground">{num(Math.max(0, l.stock - l.quantity), 0)}</span>
+              </div>
             </div>
             <Button size="icon" variant="ghost" onClick={() => onRemove(idx)}>
               <Trash2 className="h-4 w-4 text-destructive" />
