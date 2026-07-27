@@ -269,63 +269,36 @@ export function AppShell({ children }: { children: ReactNode }) {
       <NavList onNavigate={onNavigate} mini={mini} />
       <div className={cn("border-t border-sidebar-border", mini ? "p-2" : "p-3")}>
         {!mini ? (
-          <>
-            <div className="mb-2 flex items-center gap-3 rounded-lg border border-sidebar-border/60 bg-sidebar-accent/30 px-2.5 py-2 backdrop-blur">
-              <Avatar className="h-8 w-8 shrink-0">
-                <AvatarFallback className="bg-accent text-accent-foreground text-xs font-semibold">
-                  {initialsOf(user?.email)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <div
-                  className="truncate text-xs font-medium text-sidebar-accent-foreground"
-                  dir="ltr"
-                >
-                  {user?.email}
-                </div>
-                {roleLabel && (
-                  <div className="truncate text-[10px] text-sidebar-foreground/60">{roleLabel}</div>
-                )}
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 text-sidebar-foreground/85 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-              onClick={async () => {
-                await signOut();
-                navigate({ to: "/auth" });
-              }}
-            >
-              <LogOut className="h-4 w-4" aria-hidden="true" />
-              {t.logout}
-            </Button>
-          </>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 text-sidebar-foreground/85 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/auth" });
+            }}
+          >
+            <LogOut className="h-4 w-4" aria-hidden="true" />
+            {t.logout}
+          </Button>
         ) : (
-          <div className="flex flex-col items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-accent text-accent-foreground text-xs font-semibold">
-                {initialsOf(user?.email)}
-              </AvatarFallback>
-            </Avatar>
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8 text-sidebar-foreground/80 hover:bg-sidebar-accent/60"
-                  onClick={async () => {
-                    await signOut();
-                    navigate({ to: "/auth" });
-                  }}
-                >
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left" className="text-xs">
-                {t.logout}
-              </TooltipContent>
-            </Tooltip>
-          </div>
+          <Tooltip delayDuration={100}>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 text-sidebar-foreground/80 hover:bg-sidebar-accent/60"
+                onClick={async () => {
+                  await signOut();
+                  navigate({ to: "/auth" });
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left" className="text-xs">
+              {t.logout}
+            </TooltipContent>
+          </Tooltip>
         )}
       </div>
     </div>
