@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { ShoppingCart, Search, ScanLine, Zap, History, X } from "lucide-react";
+import { ShoppingCart, Search, ScanLine, Zap, History, X, Keyboard } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { money, num } from "@/lib/format";
 import { toast } from "sonner";
@@ -100,7 +100,9 @@ function PosPage() {
     if (typeof window === "undefined") return false;
     try {
       const raw = localStorage.getItem("scanner.prefs.v1");
-      return raw ? Boolean(JSON.parse(raw)?.autoOpenPos) : false;
+      if (!raw) return false;
+      const prefs = JSON.parse(raw) as { autoOpenPos?: boolean; externalScannerEnabled?: boolean };
+      return Boolean(prefs.autoOpenPos) && !Boolean(prefs.externalScannerEnabled);
     } catch {
       return false;
     }
@@ -110,6 +112,7 @@ function PosPage() {
     if (typeof window === "undefined") return false;
     return localStorage.getItem(QUICK_KEY) === "1";
   });
+  const [scannerPrefs, setScannerPrefsState] = useState(() => getScannerPrefs());
 
   const searchRef = useRef<HTMLInputElement>(null);
   const [qsPrefs, setQsPrefs] = useState<QuickSalePrefs>(() => getQuickSalePrefs());
@@ -118,6 +121,12 @@ function PosPage() {
     return localStorage.getItem("pos_last_sale_id");
   });
   const [reprinting, setReprinting] = useState(false);
+
+  useEffect(() => {
+    const handlePrefsChange = () => setScannerPrefsState(getScannerPrefs());
+    window.addEventListener("scanner-prefs-change", handlePrefsChange);
+    return () => window.removeEventListener("scanner-prefs-change", handlePrefsChange);
+  }, []);
 
   const reprintLastReceipt = useCallback(async () => {
     if (!lastSaleId) return;
@@ -1573,15 +1582,28 @@ function PosPage() {
               autoFocus
             />
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => setScannerOpen(true)}
-            title="بارکوډ سکین کړئ"
-          >
-            <ScanLine className="h-4 w-4" />
-          </Button>
+          {scannerPrefs.externalScannerEnabled ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2 px-3 text-xs"
+              onClick={() => searchRef.current?.focus()}
+              title="خارجي سکینر فعال دی"
+            >
+              <Keyboard className="h-4 w-4" />
+              خارجي سکینر فعال
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setScannerOpen(true)}
+              title="بارکوډ سکین کړئ"
+            >
+              <ScanLine className="h-4 w-4" />
+            </Button>
+          )}
         </form>
         <SaleFieldError field="scan" message={fieldErrors.scan} />
 

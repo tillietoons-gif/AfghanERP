@@ -41,7 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Download, Printer, ScanLine, Eye, Search } from "lucide-react";
+import { Plus, Trash2, Download, Printer, ScanLine, Eye, Search, Keyboard } from "lucide-react";
 import { ReceiptPreviewDialog } from "@/components/receipt-preview-dialog";
 import { t } from "@/lib/i18n";
 import { money, jalaliDateTime, num } from "@/lib/format";
@@ -106,6 +106,7 @@ function PurchasesPage() {
   const [notes, setNotes] = useState("");
   const [productSearch, setProductSearch] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [scannerPrefs, setScannerPrefsState] = useState(() => getScannerPrefs());
   const productSearchRef = useRef<HTMLInputElement>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
 
@@ -128,6 +129,12 @@ function PurchasesPage() {
   useEffect(() => {
     setSelected(new Set());
   }, [debounced, supplierFilter, statusFilter]);
+
+  useEffect(() => {
+    const handlePrefsChange = () => setScannerPrefsState(getScannerPrefs());
+    window.addEventListener("scanner-prefs-change", handlePrefsChange);
+    return () => window.removeEventListener("scanner-prefs-change", handlePrefsChange);
+  }, []);
 
   const { data: purchases, isLoading } = useQuery({
     queryKey: ["purchases-list", debounced, supplierFilter],
@@ -349,7 +356,15 @@ function PurchasesPage() {
               else {
                 try {
                   const raw = localStorage.getItem("scanner.prefs.v1");
-                  if (raw && JSON.parse(raw)?.autoOpenPurchase) setScannerOpen(true);
+                  if (raw) {
+                    const prefs = JSON.parse(raw) as {
+                      autoOpenPurchase?: boolean;
+                      externalScannerEnabled?: boolean;
+                    };
+                    if (prefs.autoOpenPurchase && !prefs.externalScannerEnabled) {
+                      setScannerOpen(true);
+                    }
+                  }
                 } catch {
                   /* ignore */
                 }
@@ -419,15 +434,28 @@ function PurchasesPage() {
                         }}
                         placeholder="نوم یا بارکوډ (Enter وټاپئ)"
                       />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setScannerOpen(true)}
-                        title="بارکوډ سکین کړئ"
-                      >
-                        <ScanLine className="h-4 w-4" />
-                      </Button>
+                      {scannerPrefs.externalScannerEnabled ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="gap-2 px-3 text-xs"
+                          onClick={() => productSearchRef.current?.focus()}
+                          title="خارجي سکینر فعال دی"
+                        >
+                          <Keyboard className="h-4 w-4" />
+                          خارجي سکینر فعال
+                        </Button>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setScannerOpen(true)}
+                          title="بارکوډ سکین کړئ"
+                        >
+                          <ScanLine className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                     {productSearch && products && products.length > 0 && (
                       <div className="max-h-40 overflow-y-auto rounded border bg-popover">
