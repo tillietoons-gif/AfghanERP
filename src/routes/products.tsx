@@ -1,7 +1,7 @@
 import { makeRouteErrorComponent } from "@/components/route-error-page";
 import { createFileRoute } from "@tanstack/react-router";
 import { ProtectedRoute } from "@/components/protected-route";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -122,6 +122,7 @@ function ProductsPage() {
   } | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [inspect, setInspect] = useState<Row | null>(null);
+  const barcodeInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const id = setTimeout(() => setDebounced(search), 300);
@@ -134,6 +135,7 @@ function ProductsPage() {
 
   useExternalBarcodeScanner({
     enabled: open,
+    ignoreWhen: () => document.activeElement !== barcodeInputRef.current,
     allowEditableTargets: true,
     onScan: (code) => {
       setForm((current) => ({ ...current, barcode: code }));
@@ -611,6 +613,7 @@ function ProductsPage() {
             </Field>
             <Field label={t.barcode}>
               <Input
+                ref={barcodeInputRef}
                 dir="ltr"
                 value={form.barcode}
                 onChange={(e) => setForm({ ...form, barcode: e.target.value })}
