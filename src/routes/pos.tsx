@@ -921,7 +921,9 @@ function PosPage() {
 
   useExternalBarcodeScanner({
     enabled: !scannerOpen,
-    onScan: (code) => lookupBarcode(code),
+    onScan: async (code) => {
+      await lookupBarcode(code);
+    },
   });
 
   const subtotal = useMemo(

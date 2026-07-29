@@ -219,7 +219,9 @@ function PurchasesPage() {
 
   useExternalBarcodeScanner({
     enabled: open && !scannerOpen,
-    onScan: (code) => lookupPurchaseBarcode(code),
+    onScan: async (code) => {
+      await lookupPurchaseBarcode(code);
+    },
   });
 
   const reset = () => {
