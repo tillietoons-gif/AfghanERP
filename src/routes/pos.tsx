@@ -921,6 +921,7 @@ function PosPage() {
 
   useExternalBarcodeScanner({
     enabled: !scannerOpen,
+    allowEditableTargets: true,
     onScan: async (code) => {
       await lookupBarcode(code);
     },

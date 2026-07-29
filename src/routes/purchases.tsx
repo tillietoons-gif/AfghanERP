@@ -219,6 +219,7 @@ function PurchasesPage() {
 
   useExternalBarcodeScanner({
     enabled: open && !scannerOpen,
+    allowEditableTargets: true,
     onScan: async (code) => {
       await lookupPurchaseBarcode(code);
     },

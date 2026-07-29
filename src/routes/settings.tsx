@@ -150,7 +150,7 @@ function SettingsPage() {
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [scannerProbeCode, setScannerProbeCode] = useState("");
   const [scannerProbeFocused, setScannerProbeFocused] = useState(false);
-  const scannerProbeRef = useRef<HTMLDivElement>(null);
+  const scannerProbeRef = useRef<HTMLInputElement>(null);
 
   const updatePref = (patch: Partial<ScannerPrefs>) => setPrefs(setScannerPrefs(patch));
   const updateQs = (patch: Partial<QuickSalePrefs>) => setQsPrefs(setQuickSalePrefs(patch));
@@ -158,6 +158,7 @@ function SettingsPage() {
   useExternalBarcodeScanner({
     enabled: activeTab === "scanner",
     ignoreWhen: () => document.activeElement !== scannerProbeRef.current,
+    allowEditableTargets: true,
     onScan: (code) => setScannerProbeCode(code),
   });
 
@@ -537,22 +538,26 @@ function SettingsPage() {
                         ازموینه پیل
                       </Button>
                     </div>
-                    <div
+                    <Input
                       ref={scannerProbeRef}
-                      tabIndex={0}
+                      dir="ltr"
+                      readOnly
+                      value={scannerProbeCode}
+                      placeholder="Scanner test output"
                       onFocus={() => setScannerProbeFocused(true)}
                       onBlur={() => setScannerProbeFocused(false)}
-                      className="mt-3 rounded-md border bg-muted/30 p-3 text-left outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    >
-                      <div className="text-[11px] text-muted-foreground">
-                        {scannerProbeFocused
-                          ? "چمتو دی: اوس سکین وکړئ"
-                          : "د ازموینې لپاره دلته کلیک یا Tab وکړئ"}
-                      </div>
-                      <div className="mt-2 font-mono text-sm" dir="ltr">
-                        {scannerProbeCode || "No scan detected yet"}
-                      </div>
+                      className="mt-3 font-mono text-left"
+                    />
+                    <div className="mt-2 text-[11px] text-muted-foreground">
+                      {scannerProbeFocused
+                        ? "چمتو دی: اوس سکین وکړئ"
+                        : "د ازموینې لپاره دلته کلیک یا Tab وکړئ"}
                     </div>
+                    {!scannerProbeCode && (
+                      <div className="mt-1 text-[11px] text-muted-foreground" dir="ltr">
+                        No scan detected yet
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
