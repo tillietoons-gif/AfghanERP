@@ -52,6 +52,7 @@ import { ScanHistoryPanel } from "@/components/scan-history-panel";
 import { ScanFallbackDialog } from "@/components/scan-fallback-dialog";
 import { recordScan } from "@/lib/scan-session";
 import { getScannerPrefs } from "@/lib/scanner-prefs";
+import { useExternalBarcodeScanner } from "@/lib/external-barcode-scanner";
 import { DataTableShell, DetailDrawer } from "@/components/data-table-shell";
 import { PageHeader } from "@/components/page-header";
 import {
@@ -215,6 +216,11 @@ function PurchasesPage() {
     setFallbackCode(trimmed);
     return false;
   };
+
+  useExternalBarcodeScanner({
+    enabled: open && !scannerOpen,
+    onScan: (code) => lookupPurchaseBarcode(code),
+  });
 
   const reset = () => {
     setSupplierId("");

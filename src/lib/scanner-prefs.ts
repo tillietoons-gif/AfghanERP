@@ -7,6 +7,10 @@ export interface ScannerPrefs {
   continuous: boolean;
   preferredCameraId: string;
   cooldownMs: number;
+  externalScannerEnabled: boolean;
+  externalScannerSubmitKey: "enter" | "tab" | "none";
+  externalScannerIdleMs: number;
+  externalScannerMinLength: number;
   autoOpenPos: boolean;
   autoOpenPurchase: boolean;
   repeatScanMode: "increment" | "pack";
@@ -25,6 +29,10 @@ export const defaultPrefs: ScannerPrefs = {
   continuous: false,
   preferredCameraId: "",
   cooldownMs: 900,
+  externalScannerEnabled: true,
+  externalScannerSubmitKey: "enter",
+  externalScannerIdleMs: 120,
+  externalScannerMinLength: 4,
   autoOpenPos: false,
   autoOpenPurchase: false,
   repeatScanMode: "pack",

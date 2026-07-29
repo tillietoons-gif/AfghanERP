@@ -28,10 +28,20 @@ import { Switch } from "@/components/ui/switch";
 import { t } from "@/lib/i18n";
 import { toast } from "sonner";
 import { getScannerPrefs, setScannerPrefs, type ScannerPrefs } from "@/lib/scanner-prefs";
+import { useExternalBarcodeScanner } from "@/lib/external-barcode-scanner";
 import { getQuickSalePrefs, setQuickSalePrefs, type QuickSalePrefs } from "@/lib/quick-sale-prefs";
 import { hasAnyRole } from "@/hooks/use-auth";
 import { jalaliDateTime } from "@/lib/format";
-import { Download, HardDrive, Minus, Monitor, Plus, RefreshCw, RotateCcw, Upload } from "lucide-react";
+import {
+  Download,
+  HardDrive,
+  Minus,
+  Monitor,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  Upload,
+} from "lucide-react";
 import { APP_ZOOM, getAppZoom, setAppZoom } from "@/lib/app-zoom";
 import { resetLocalOperatorPassword, signOutLocally } from "@/lib/local-auth";
 import {
@@ -138,9 +148,18 @@ function SettingsPage() {
   const [prefs, setPrefs] = useState<ScannerPrefs>(() => getScannerPrefs());
   const [qsPrefs, setQsPrefs] = useState<QuickSalePrefs>(() => getQuickSalePrefs());
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
+  const [scannerProbeCode, setScannerProbeCode] = useState("");
+  const [scannerProbeFocused, setScannerProbeFocused] = useState(false);
+  const scannerProbeRef = useRef<HTMLDivElement>(null);
 
   const updatePref = (patch: Partial<ScannerPrefs>) => setPrefs(setScannerPrefs(patch));
   const updateQs = (patch: Partial<QuickSalePrefs>) => setQsPrefs(setQuickSalePrefs(patch));
+
+  useExternalBarcodeScanner({
+    enabled: activeTab === "scanner",
+    ignoreWhen: () => document.activeElement !== scannerProbeRef.current,
+    onScan: (code) => setScannerProbeCode(code),
+  });
 
   const loadCameras = async () => {
     try {
@@ -420,6 +439,120 @@ function SettingsPage() {
                     >
                       تازه کول
                     </Button>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-md border p-3">
+                <div className="text-xs font-medium">د خارجي بارکوډ سکینر تنظیم</div>
+                <div className="mt-1 text-[11px] text-muted-foreground">
+                  د USB/Bluetooth سکینر لپاره. که فوکس په لټون خانه کې نه وي، سیستم به چټک ټایپ شوی
+                  کوډ ونیسي.
+                </div>
+                <div className="mt-3 space-y-3">
+                  <PrefRow
+                    label="خارجي سکینر فعال"
+                    desc="په POS او پېرود کې د کیبورډ-ډوله سکینر کوډونه ونیسئ"
+                    checked={prefs.externalScannerEnabled}
+                    onChange={(v) => updatePref({ externalScannerEnabled: v })}
+                  />
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-md border p-2">
+                      <Label className="text-xs">د پای تڼۍ</Label>
+                      <select
+                        className="mt-1 w-full rounded border bg-background p-1 text-xs"
+                        value={prefs.externalScannerSubmitKey}
+                        onChange={(e) =>
+                          updatePref({
+                            externalScannerSubmitKey: e.target.value as "enter" | "tab" | "none",
+                          })
+                        }
+                      >
+                        <option value="enter">Enter</option>
+                        <option value="tab">Tab</option>
+                        <option value="none">هیڅ نه</option>
+                      </select>
+                      <div className="mt-1 text-[11px] text-muted-foreground">
+                        ډېری سکینرونه Enter لېږي. که ستاسو Tab لېږي، دلته یې بدل کړئ.
+                      </div>
+                    </div>
+                    <div className="rounded-md border p-2">
+                      <Label className="text-xs">د تم کېدو ځنډ (ms)</Label>
+                      <Input
+                        type="number"
+                        min={50}
+                        max={1000}
+                        step={10}
+                        dir="ltr"
+                        value={prefs.externalScannerIdleMs}
+                        onChange={(e) =>
+                          updatePref({
+                            externalScannerIdleMs: Math.max(
+                              50,
+                              Math.min(1000, Number(e.target.value) || 120),
+                            ),
+                          })
+                        }
+                      />
+                      <div className="mt-1 text-[11px] text-muted-foreground">
+                        که سکینر Enter/Tab نه لېږي، له همدې ځنډ وروسته کوډ بشپړ ګڼل کېږي.
+                      </div>
+                    </div>
+                    <div className="rounded-md border p-2">
+                      <Label className="text-xs">تر ټولو لږ حروف</Label>
+                      <Input
+                        type="number"
+                        min={3}
+                        max={32}
+                        step={1}
+                        dir="ltr"
+                        value={prefs.externalScannerMinLength}
+                        onChange={(e) =>
+                          updatePref({
+                            externalScannerMinLength: Math.max(
+                              3,
+                              Math.min(32, Number(e.target.value) || 4),
+                            ),
+                          })
+                        }
+                      />
+                      <div className="mt-1 text-[11px] text-muted-foreground">
+                        ډېر لنډ کوډونه به د ناڅاپي کیلي وهلو د مخنیوي لپاره ونه نیول شي.
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-md border border-dashed p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <div className="text-xs font-medium">د سکینر ازموینه</div>
+                        <div className="text-[11px] text-muted-foreground">
+                          لاندې ساحه فوکس کړئ، بیا بارکوډ سکین کړئ.
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => scannerProbeRef.current?.focus()}
+                      >
+                        ازموینه پیل
+                      </Button>
+                    </div>
+                    <div
+                      ref={scannerProbeRef}
+                      tabIndex={0}
+                      onFocus={() => setScannerProbeFocused(true)}
+                      onBlur={() => setScannerProbeFocused(false)}
+                      className="mt-3 rounded-md border bg-muted/30 p-3 text-left outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                      <div className="text-[11px] text-muted-foreground">
+                        {scannerProbeFocused
+                          ? "چمتو دی: اوس سکین وکړئ"
+                          : "د ازموینې لپاره دلته کلیک یا Tab وکړئ"}
+                      </div>
+                      <div className="mt-2 font-mono text-sm" dir="ltr">
+                        {scannerProbeCode || "No scan detected yet"}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

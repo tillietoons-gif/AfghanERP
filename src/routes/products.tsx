@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { DataTableShell, DetailDrawer } from "@/components/data-table-shell";
 import { PageHeader } from "@/components/page-header";
+import { useExternalBarcodeScanner } from "@/lib/external-barcode-scanner";
 import {
   adjustLocalProductStock,
   countLocalProducts,
@@ -130,6 +131,14 @@ function ProductsPage() {
     setPage(0);
     setSelected(new Set());
   }, [debounced, status, categoryId]);
+
+  useExternalBarcodeScanner({
+    enabled: open,
+    allowEditableTargets: true,
+    onScan: (code) => {
+      setForm((current) => ({ ...current, barcode: code }));
+    },
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ["products", debounced, page, categoryId],

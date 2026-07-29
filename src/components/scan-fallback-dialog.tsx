@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { useExternalBarcodeScanner } from "@/lib/external-barcode-scanner";
 import { t } from "@/lib/i18n";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { createLocalBarcode, listLocalProductsFull } from "@/lib/local-store";
@@ -67,6 +68,11 @@ export function ScanFallbackDialog({ open, code, onClose, onMapped }: Props) {
     queryKey: ["scan-fallback-products", search],
     enabled: open,
     queryFn: (): Promise<ProductLite[]> => listLocalProductsFull(search, 20),
+  });
+
+  useExternalBarcodeScanner({
+    enabled: open && step === "pick",
+    onScan: (nextCode) => setSearch(nextCode),
   });
 
   const reset = () => {

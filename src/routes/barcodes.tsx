@@ -34,6 +34,7 @@ import { Plus, Trash2, ScanLine, Download, Upload } from "lucide-react";
 import { BarcodeScanner } from "@/components/barcode-scanner";
 import { BarcodeImportDialog } from "@/components/barcode-import-dialog";
 import { exportCsv } from "@/lib/csv";
+import { useExternalBarcodeScanner } from "@/lib/external-barcode-scanner";
 import { t } from "@/lib/i18n";
 import { num } from "@/lib/format";
 import { toast } from "sonner";
@@ -104,6 +105,15 @@ function BarcodesPage() {
     setProdQuery("");
     setFormErrors({});
   };
+
+  useExternalBarcodeScanner({
+    enabled: open && !scanOpen && !importOpen,
+    allowEditableTargets: true,
+    onScan: (code) => {
+      setForm((current) => ({ ...current, barcode: code }));
+      setFormErrors((current) => ({ ...current, barcode: "" }));
+    },
+  });
 
   const save = async () => {
     // Client-side validation surfaces the same way as server-side field errors.

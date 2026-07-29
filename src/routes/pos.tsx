@@ -38,6 +38,7 @@ import { buildCreateSaleArgs } from "@/lib/pos-sale";
 import { validateBarcode } from "@/lib/barcode-validation";
 import { logPosEvent } from "@/lib/pos-audit";
 import { openReceiptWithRetry } from "@/lib/pos-print";
+import { useExternalBarcodeScanner } from "@/lib/external-barcode-scanner";
 import { Printer } from "lucide-react";
 import {
   getActiveDraft,
@@ -917,6 +918,11 @@ function PosPage() {
     e.preventDefault();
     await lookupBarcode(query);
   };
+
+  useExternalBarcodeScanner({
+    enabled: !scannerOpen,
+    onScan: (code) => lookupBarcode(code),
+  });
 
   const subtotal = useMemo(
     () => cart.reduce((s, l) => s + l.price * l.quantity - l.discount, 0),
